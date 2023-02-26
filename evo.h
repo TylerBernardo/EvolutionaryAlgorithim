@@ -25,7 +25,10 @@ class EvoController{
 };
 
 class Agent{
+public:
+    Agent(){
 
+    }
 };
 
 void learn(int inputSpaceLength, EvoController *controller, int outputSpaceLength, int populationSize, int hiddenLayerNum, int *hiddenLayers, int generations );
