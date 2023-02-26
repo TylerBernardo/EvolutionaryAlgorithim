@@ -19,7 +19,7 @@ public:
 
     }
 };
-
+//pure virtual class
 class EvoController{
     Agent *agents;
     public:
