@@ -13,6 +13,7 @@
 #include "newNetwork.h"
 using namespace Eigen;
 
+//pure virtual class to allow scene specific actions to be made.
 class Agent{
 public:
     Agent(){
