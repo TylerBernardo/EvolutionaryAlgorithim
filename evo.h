@@ -15,15 +15,18 @@ using namespace Eigen;
 
 //pure virtual class to allow scene specific actions to be made.
 class Agent{
-public:
-    Agent(){
+    int inputSpaceLength, outputSpaceLength, hiddenLayerCount;
+    public:
+        Agent(){
 
-    }
+        }
 };
 //pure virtual class
 class EvoController{
-    Agent *agents;
+
     public:
+
+    Agent *agents;
         EvoController(){
 
         }
