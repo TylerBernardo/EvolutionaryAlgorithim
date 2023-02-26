@@ -13,8 +13,15 @@
 #include "newNetwork.h"
 using namespace Eigen;
 
+class Agent{
+public:
+    Agent(){
+
+    }
+};
 
 class EvoController{
+    Agent *agents;
     public:
         EvoController(){
 
@@ -24,12 +31,7 @@ class EvoController{
         virtual int state(double *output, int length);
 };
 
-class Agent{
-public:
-    Agent(){
 
-    }
-};
 
 void learn(int inputSpaceLength, EvoController *controller, int outputSpaceLength, int populationSize, int hiddenLayerNum, int *hiddenLayers, int generations );
 
