@@ -32,6 +32,7 @@ class Network {
         ~Network();
         void print();
         void calc(VectorXd &input, MatrixXd &output);
+        void calc(double *input, int inputLength, const double *output, int outputLength);
         void clearMemory();
         void generateDNA();
         void convert(std::string& output);

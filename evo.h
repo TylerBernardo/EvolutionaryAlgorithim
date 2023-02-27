@@ -17,22 +17,34 @@ using namespace Eigen;
 class Agent{
     int inputSpaceLength, outputSpaceLength, hiddenLayerCount;
     public:
-        Agent(){
-
-        }
+        Network network;
+        int reward;
+        //should the simulation end? Returns true when it should
+        virtual bool endState();
 };
 //pure virtual class
 class EvoController{
 
     public:
-
+    int inputSpaceLength, outputSpaceLength, hiddenLayerCount;
+    int *hiddenLayers;
     Agent *agents;
-        EvoController(){
 
-        }
+        /* base variables required for evoController;
+        EvoController(int _inputSpaceLength, int _outputSpaceLength, int _hiddenLayerCount){
+            this->inputSpaceLength = _inputSpaceLength;
+            this->outputSpaceLength = _outputSpaceLength;
+            this ->hiddenLayerCount = _hiddenLayerCount;
+            this->hiddenLayers = new int[this->hiddenLayerCount];
+        }*/
+        //should returen an array of length "inputSpaceLength" that represents all the inputs for the net of the agent located at agents[i]
+        virtual double* genInputSpace(int agentNumber);
+        //should take in the output of the neural net and determine what action to take. Should take that action, then return score. also in charge of termination the simulation.
+        virtual int state(double *output);
+        //creates an agent
+        Agent* createAgent();
 
-        virtual int* genInputSpace();
-        virtual int state(double *output, int length);
+
 };
 
 

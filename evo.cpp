@@ -6,22 +6,34 @@
 
 
 //takes in the length of the input space, a function to generate the input space, the length of the output space, and a function to map net outputs to the gamespace, which then returns reward info
-void learn(int inputSpaceLength, EvoController *controller, int outputSpaceLength, int populationSize, int hiddenLayerNum, int *hiddenLayers, int generations ){
-    int networkLength = 2 + hiddenLayerNum;
+void learn(EvoController *controller, int populationSize, int generations ){
+    int networkLength = 2 + controller->hiddenLayerCount;
     int *networkHeight = new int[networkLength];
-    networkHeight[0] = inputSpaceLength;
-    networkHeight[networkLength-1] = outputSpaceLength;
+    networkHeight[0] = controller->inputSpaceLength;
+    networkHeight[networkLength-1] = controller->outputSpaceLength;
     for(int i = 1; i < networkLength - 2; i ++){
-        networkHeight[i] = hiddenLayers[i - 1];
+        networkHeight[i] = controller->hiddenLayers[i - 1];
     }
     //create array of agents
-    Network *agents = new Network[populationSize];
+    Agent *agents;
     //initialize agents
     for(int i = 0; i < populationSize - 1; i++){
-        agents[i] = Network(networkLength,networkHeight);
+        agents[i] = *(controller->createAgent());//Network(networkLength,networkHeight);
     }
-    //main loop
+    //main loop,
     for(int g = 1; g < generations; g++){
+        //loop through each agent
+        for(int i = 0; i < populationSize - 1; i++){
+            do{
+                //evaluate the agent's network on the current state
+                double* output;
+                controller->agents[i].network.calc(controller->genInputSpace(i),controller->inputSpaceLength,output, controller->outputSpaceLength);
+                int reward = controller->state(output);
+                //process reward here
+                controller->agents[i].reward += reward;
+            }while(controller->agents[i].endState());
+        }
+        //mutation happens here
 
     }
 }
