@@ -14,17 +14,19 @@ using namespace Eigen;
 
 class Network {
     //1d array, index 0 = weights between layer 0 and 1
-    MatrixXd* weights;
-    MatrixXd* bias;
-    VectorXd* inputs;
-    int *height;
-    int length;
+
+
 
     //DNA
     //contains the weights and biases for each. Value encoding acording to this link : https://www.obitko.com/tutorials/genetic-algorithms/encoding.php
     //mutation can take random parts of each parent and make a new one.
     //matrix is fixed shape
     public:
+        MatrixXd* weights;
+        MatrixXd* bias;
+        VectorXd* inputs;
+        int *height;
+        int length;
         int size = 0;
         double* dna;
         Network();

@@ -4,9 +4,49 @@
 
 #include "evo.h"
 
+std::uniform_real_distribution<double> unif(0,1);
+std::default_random_engine re;
 
-//takes in the length of the input space, a function to generate the input space, the length of the output space, and a function to map net outputs to the gamespace, which then returns reward info
-void learn(EvoController *controller, int populationSize, int generations ){
+MatrixXd combineMatrixRandom(MatrixXd &matrix1, MatrixXd &matrix2){
+    int length = matrix1.rows(), height = matrix1.cols();
+    MatrixXd output = MatrixXd::Zero(length,height);
+    for(int r = 0; r < length; r++){
+        for(int c = 0; c < length; c++){
+            double ranNum = unif(re);
+            if(ranNum <= .5){
+                output(r,c) = matrix1(r,c);
+            }else{
+                output(r,c) = matrix2(r,c);
+            }
+        }
+    }
+    output = output + 0.5 * MatrixXd::Random(length,height);
+    return output;
+}
+
+int compareFunction(Agent &a1, Agent &a2){
+    return a1.reward >= a2.reward;
+}
+
+//take the top quarter of agents and repopulate from there
+void crossover(Agent* agents,int length){
+    int toKeep = std::round(length/4.0);
+    std::uniform_int_distribution<int> iUnif(0,toKeep-1);
+    for(int a = 0; a < length-toKeep; a++){
+        //determine twoParents TODO: check to make sure parent1 != parent2
+        Agent parent1 = agents[iUnif(re)], parent2 = agents[iUnif(re)];
+        Network network = agents[a+toKeep].network;
+        for(int i = 0; i < network.length-1; i++){
+            network.weights[i] = combineMatrixRandom(parent1.network.weights[i],parent2.network.weights[i]);
+            network.bias[i] = combineMatrixRandom(parent1.network.bias[i],parent2.network.bias[i]);
+        }
+        network.bias[network.length-1] = combineMatrixRandom(parent1.network.bias[network.length-1],parent2.network.bias[network.length-1]);
+        agents[a+toKeep].network = network;
+    }
+}
+
+//takes in the length of the input space, a function to generate the input space, the length of the output space, and a function to map net outputs to the gamespace, which then returns reward info.
+Agent learn(EvoController *controller, int populationSize, int generations ){
     int networkLength = 2 + controller->hiddenLayerCount;
     int *networkHeight = new int[networkLength];
     networkHeight[0] = controller->inputSpaceLength;
@@ -14,11 +54,9 @@ void learn(EvoController *controller, int populationSize, int generations ){
     for(int i = 1; i < networkLength - 2; i ++){
         networkHeight[i] = controller->hiddenLayers[i - 1];
     }
-    //create array of agents
-    Agent *agents;
     //initialize agents
     for(int i = 0; i < populationSize - 1; i++){
-        agents[i] = *(controller->createAgent());//Network(networkLength,networkHeight);
+        controller->agents[i] = *(controller->createAgent());//Network(networkLength,networkHeight);
     }
     //main loop,
     for(int g = 1; g < generations; g++){
@@ -33,7 +71,13 @@ void learn(EvoController *controller, int populationSize, int generations ){
                 controller->agents[i].reward += reward;
             }while(controller->agents[i].endState());
         }
+        //determine top performers
+        std::sort(controller->agents, ((controller->agents)+populationSize-1), compareFunction);
         //mutation happens here
-
+        crossover(controller->agents,populationSize);
+        for(int a = 0; a < populationSize; a++){
+            controller->agents[a].reward = 0;
+        }
     }
+    return controller->agents[0];
 }

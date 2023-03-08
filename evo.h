@@ -10,6 +10,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <string>
+#include <random>
 #include "newNetwork.h"
 using namespace Eigen;
 
@@ -37,7 +38,7 @@ class EvoController{
             this ->hiddenLayerCount = _hiddenLayerCount;
             this->hiddenLayers = new int[this->hiddenLayerCount];
         }*/
-        //should returen an array of length "inputSpaceLength" that represents all the inputs for the net of the agent located at agents[i]
+        //should return an array of length "inputSpaceLength" that represents all the inputs for the net of the agent located at agents[i]
         virtual double* genInputSpace(int agentNumber);
         //should take in the output of the neural net and determine what action to take. Should take that action, then return score. also in charge of termination the simulation.
         virtual int state(double *output);
@@ -49,6 +50,6 @@ class EvoController{
 
 
 
-void learn(int inputSpaceLength, EvoController *controller, int outputSpaceLength, int populationSize, int hiddenLayerNum, int *hiddenLayers, int generations );
+Agent learn(EvoController *controller, int populationSize, int generations );
 
 #endif //EVOLUTIONARYALGORITHIM_EVO_H
