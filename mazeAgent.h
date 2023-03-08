@@ -27,9 +27,7 @@ class MazeAgent : public Agent{
             }
         }
 
-        bool endState() override;
-
-        int calcReward(int move[2]);
+        void calcReward(int move[2]);
 
         ~MazeAgent(){
             for(int i = 0; i < maze->getDimensions()[1]; i++){
@@ -47,8 +45,26 @@ class MazeController : public EvoController{
     int end[2];
     int *mazeData;
     public:
-        //MazeAgent **agents;
-        MazeController(int _hiddenLayerCount, int* _hiddenLayers, int _agentCount,int (&_dim)[2], int (&_cur)[2], int (&_end)[2], int *_mazeData){
+        MazeAgent **agents;
+        MazeController(int _hiddenLayerCount, int* _hiddenLayers, int _agentCount){
+            this->inputSpaceLength = 6;
+            this->outputSpaceLength = 4;
+            this->hiddenLayerCount = _hiddenLayerCount;
+            this->hiddenLayers = _hiddenLayers;
+            this->agentCount = _agentCount;
+            this-> agents = new MazeAgent *[this->agentCount];
+            for(int i = 0; i < agentCount; i++){
+                agents[i] = this->createAgent();
+            }
+        }
+
+        double* genInputSpace(int agentNumber);
+        //should take in the output of the neural net and determine what action to take. Should take that action, then return score. also in charge of termination the simulation.
+        virtual int state(double *output, int agentNumber);
+        //creates an agent
+        MazeAgent* createAgent();
+
+        void setMazeInfo(int (&_dim)[2], int (&_cur)[2], int (&_end)[2], int *_mazeData){
             this->dim[0] = _dim[0];
             this->dim[1] = _dim[1];
             this->cur[0] = _cur[0];
@@ -56,24 +72,7 @@ class MazeController : public EvoController{
             this->end[0] = _end[0];
             this->end[1] = _end[1];
             this->mazeData = _mazeData;
-            this->inputSpaceLength = 6;
-            this->outputSpaceLength = 4;
-            this->hiddenLayerCount = _hiddenLayerCount;
-            this->hiddenLayers = _hiddenLayers;
-            this->agentCount = _agentCount;
-            this-> agents = new Agent *[this->agentCount];
-            for(int i = 0; i < agentCount; i++){
-                agents[i] = this->createAgent();
-            }
         }
-
-        double* genInputSpace(int agentNumber) override;
-        //should take in the output of the neural net and determine what action to take. Should take that action, then return score. also in charge of termination the simulation.
-        int state(double *output, int agentNumber) override;
-        //creates an agent
-        MazeAgent* createAgent() override;
-
-
 
         Maze* makeMaze();
 
