@@ -8,8 +8,8 @@
 using namespace Eigen;
 
 int main() {
-    int length = 3;
-    int *height = new int[3]{4,3,4};
+    int length = 5;
+    int *height = new int[length]{10,6,6,6,10};
     //Network myNetwork = {length,height};
     //myNetwork.calc(input,output);
     //myNetwork.clearMemory();
@@ -20,7 +20,7 @@ int main() {
     int stop[2] = {0,2};
     Maze myMaze = {dimensionsTemp, start, stop,mazeTemp};
     int populationSize = 100;
-    int generations = 1000;
+    int generations = 10000;
     MazeController mazeC = {3,height,populationSize,dimensionsTemp,start,stop,mazeTemp};
     //myMaze.print();
     MazeAgent* best = dynamic_cast<MazeAgent *>(learn(&mazeC, populationSize, generations));
