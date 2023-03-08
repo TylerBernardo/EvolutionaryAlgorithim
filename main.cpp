@@ -9,11 +9,11 @@ using namespace Eigen;
 
 int main() {
     int length = 3;
-    int height[3] = {4,3,4};
+    int *height = new int[3]{4,3,4};
     //Network myNetwork = {length,height};
     //myNetwork.calc(input,output);
     //myNetwork.clearMemory();
-    void (*genInputSpace)(int *);
+    //void (*genInputSpace)(int *);
     int mazeTemp[25] = {0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 2, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 1};
     int dimensionsTemp[2] = {5,5};
     int start[2] = {2,2};
@@ -21,8 +21,8 @@ int main() {
     //Maze myMaze = {dimensionsTemp, start, stop,mazeTemp};
     int populationSize = 20;
     int generations = 100;
-    MazeController mazeC = {3,height,populationSize};
-    mazeC.setMazeInfo(dimensionsTemp,start,stop,mazeTemp);
+    MazeController mazeC = {3,height,populationSize,dimensionsTemp,start,stop,mazeTemp};
+    //mazeC.agents[19]->maze->print();
     learn(&mazeC,populationSize,generations);
     /*
     std::cout << std::endl;

@@ -16,7 +16,7 @@ Maze::Maze(int (&dim)[2],int (&cur)[2],int (&end)[2], int * maze){
         this->end[1] = end[1];
         current[0] = cur[0];
         current[1] = cur[1];
-        std::cout << current[0] << " " << current[1] << std::endl;
+        //std::cout << current[0] << " " << current[1] << std::endl;
         this->maze = new int*[dim[1]];
         for(int i= 0; i < dim[1]; i++){
             this->maze[i] = new int[dim[0]];

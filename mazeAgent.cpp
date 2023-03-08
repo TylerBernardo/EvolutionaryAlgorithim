@@ -7,16 +7,22 @@
 //TODO:hidden layers should only be used for hidden layer heights, add input and outpuyt length to start/end of that array
 MazeAgent *MazeController::createAgent() {
    MazeAgent* toReturn = new MazeAgent(this->makeMaze(),this->inputSpaceLength,this->outputSpaceLength,this->hiddenLayerCount);
-    toReturn->network = *(new Network(this->hiddenLayerCount,this->hiddenLayers));
+   int *networkHeights = new int[hiddenLayerCount + 2];
+   networkHeights[0] = inputSpaceLength;
+   networkHeights[hiddenLayerCount + 1] = outputSpaceLength;
+   for(int i = 1; i < hiddenLayerCount + 1; i++){
+       networkHeights[i] = hiddenLayers[i-1];
+   }
+    toReturn->network = new Network((this->hiddenLayerCount)+2,networkHeights);
     return toReturn;
 }
 
 double* MazeController::genInputSpace(int agentNumber) {
-    MazeAgent* currentAgent = this->agents[agentNumber];
+    MazeAgent* currentAgent = dynamic_cast<MazeAgent *>(this->agents[agentNumber]);
     Maze* currentMaze = currentAgent->maze;
     int mazeSight[4];
     currentMaze->getDistance(mazeSight);
-    double inputs[6] = {static_cast<double>(currentMaze->getCurrent()[0]),static_cast<double>(currentMaze->getCurrent()[1]),static_cast<double>(mazeSight[0]),static_cast<double>(mazeSight[1]),static_cast<double>(mazeSight[2]),static_cast<double>(mazeSight[3])};
+    double *inputs = new double[6]{static_cast<double>(currentMaze->getCurrent()[0]),static_cast<double>(currentMaze->getCurrent()[1]),static_cast<double>(mazeSight[0]),static_cast<double>(mazeSight[1]),static_cast<double>(mazeSight[2]),static_cast<double>(mazeSight[3])};
     return inputs;
 }
 
@@ -47,7 +53,8 @@ int MazeController::state(double *output, int agentNumber) {
             move[1] = 0;
             break;
     };
-    this->agents[agentNumber]->calcReward(move);
+    MazeAgent* currentAgent = dynamic_cast<MazeAgent *>(this->agents[agentNumber]);
+    return currentAgent->calcReward(move);
 }
 
 Maze *MazeController::makeMaze() {
@@ -55,14 +62,14 @@ Maze *MazeController::makeMaze() {
     //return nullptr;
 }
 
-void MazeAgent::calcReward(int *move) {
+int MazeAgent::calcReward(int *move) {
     static int steps = 0;
     steps++;
     int result = this->maze->move(move);
     int reward;
     if(result == -1){
         reward = -500;
-        this->reward = reward;
+        //this->reward = reward;
     }else if(result == 0){
         reward+=6;
     }else{
@@ -71,5 +78,17 @@ void MazeAgent::calcReward(int *move) {
     //check if agent is just walking in same pattern over and over;
     int *coords = this->maze->getCurrent();
     reward -= heatMap[coords[1]][coords[0]]++;
-    this->reward = reward;
+    //this->reward = reward;
+    return reward;
+}
+
+bool MazeAgent::endState() {
+    static int moves = 0;
+    moves++;
+    int *pos = maze->getCurrent();
+    int posA[2];
+    posA[0] = pos[0];
+    posA[1] = pos[1];
+    return !(maze->getTile(posA) == 2 || moves >= 100);
+    //return Agent::endState();
 }
