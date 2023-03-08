@@ -2,6 +2,8 @@
 #include <Eigen/Dense>
 #include "newNetwork.h"
 #include "maze.h"
+#include "mazeAgent.h"
+#include "evo.h"
 
 using namespace Eigen;
 
@@ -16,7 +18,12 @@ int main() {
     int dimensionsTemp[2] = {5,5};
     int start[2] = {2,2};
     int stop[2] = {0,2};
-    Maze myMaze = {dimensionsTemp, start, stop,mazeTemp};
+    //Maze myMaze = {dimensionsTemp, start, stop,mazeTemp};
+    int populationSize = 20;
+    int generations = 100;
+    MazeController mazeC = {3,height,populationSize};
+    mazeC.setMazeInfo(dimensionsTemp,start,stop,mazeTemp);
+    learn(&mazeC,populationSize,generations);
     /*
     std::cout << std::endl;
     myMaze.print();

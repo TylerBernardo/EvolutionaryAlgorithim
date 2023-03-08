@@ -21,5 +21,9 @@ public:
     void print();
 
     int move(int dir[2]);
+
+    int* getCurrent();
+
+    int* getDimensions();
 };
 #endif //EVOLUTIONARYALGORITHIM_MAZE_H

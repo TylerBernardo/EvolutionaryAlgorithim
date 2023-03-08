@@ -5,6 +5,9 @@
 #include "maze.h"
 #include <iostream>
 
+int* Maze::getCurrent() {
+    return this->current;
+}
 
 Maze::Maze(int (&dim)[2],int (&cur)[2],int (&end)[2], int * maze){
         dimensions[0] = dim[0];
@@ -71,8 +74,12 @@ int Maze::move(int dir[2]){
     if(check == 0 || check == 2){
         current[0] = newPos[0];
         current[1] = newPos[1];
-        return 1;
+        return check;
     }else{
         return -1;
     }
+}
+
+int *Maze::getDimensions() {
+    return this->dimensions;
 }
