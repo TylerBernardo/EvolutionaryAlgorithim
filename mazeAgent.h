@@ -11,6 +11,7 @@ class MazeAgent : public Agent{
     public:
         Maze *maze;
         int ** heatMap;
+        int moves = 0;
         MazeAgent(){
             maze = nullptr;
         }
@@ -24,10 +25,15 @@ class MazeAgent : public Agent{
             int length = maze->getDimensions()[0];
             for(int i = 0; i < maze->getDimensions()[1]; i++){
                 heatMap[i] = new int[length];
+                for(int j = 0; j < length; j++){
+                    heatMap[i][j] = 0;
+                }
             }
         }
 
         bool endState() override;
+
+
 
         int calcReward(int move[2]);
 
@@ -73,7 +79,7 @@ class MazeController : public EvoController{
         //creates an agent
         MazeAgent* createAgent() override;
 
-
+        void reset(int agentNumber) override;
 
         Maze* makeMaze();
 

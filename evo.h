@@ -20,15 +20,12 @@ class Agent{
         int inputSpaceLength, outputSpaceLength, hiddenLayerCount;
     public:
         Network *network = nullptr;
-        int reward;
+        int reward = 0;
         //should the simulation end? Returns true when it should
         virtual bool endState(){return false;};
 
         ~Agent(){
-
-            delete network;
-
-
+            //delete network;
         }
 };
 //pure virtual class
@@ -53,7 +50,8 @@ class EvoController{
         virtual int state(double *output, int agentNumber){return 0;};
         //creates an agent
         virtual Agent* createAgent(){return nullptr;};
-
+        //reset agent at agents[agentNum]
+        virtual void reset(int agentNum){};
 
 };
 

@@ -18,12 +18,23 @@ int main() {
     int dimensionsTemp[2] = {5,5};
     int start[2] = {2,2};
     int stop[2] = {0,2};
-    //Maze myMaze = {dimensionsTemp, start, stop,mazeTemp};
-    int populationSize = 20;
-    int generations = 100;
+    Maze myMaze = {dimensionsTemp, start, stop,mazeTemp};
+    int populationSize = 100;
+    int generations = 1000;
     MazeController mazeC = {3,height,populationSize,dimensionsTemp,start,stop,mazeTemp};
-    //mazeC.agents[19]->maze->print();
-    learn(&mazeC,populationSize,generations);
+    //myMaze.print();
+    MazeAgent* best = dynamic_cast<MazeAgent *>(learn(&mazeC, populationSize, generations));
+    mazeC.reset(0);
+    do{
+        //evaluate the agent's network on the current state
+        double* output = new double[mazeC.outputSpaceLength];
+        best->network->calc(mazeC.genInputSpace(0),mazeC.inputSpaceLength,output, mazeC.outputSpaceLength);
+        best->maze->print();
+        std::cout << std::endl << "----------" << std::endl;
+        int reward = mazeC.state(output,0);
+        //process reward here
+        best->reward += reward;
+    }while(best->endState());
     /*
     std::cout << std::endl;
     myMaze.print();

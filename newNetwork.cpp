@@ -10,6 +10,7 @@ inline double sigmoid(double x){
 }
 
 inline void sigmoidVector(MatrixXd &input, int height){
+    //std::cout << input << std::endl;
     for(int i = 0; i < height; i++){
         input(i) = sigmoid(input(i));
     }
@@ -80,11 +81,14 @@ void Network::calc(VectorXd &input, MatrixXd &output){
     output = inputs[length-1];
 }
 
-void Network::calc(double *input, int inputLength, const double *output, int outputLength){
+void Network::calc(double *input, int inputLength, double *output, int outputLength){
     VectorXd vInput = arrayToVector(input,inputLength);
     MatrixXd vOutput;
     calc(vInput,vOutput);
-    output = vOutput.data();
+    for(int i = 0; i < outputLength; i++){
+      output[i] = vOutput(i);
+    }
+    //output = vOutput.data();
 }
 
 void Network::generateDNA() {

@@ -11,7 +11,7 @@ MatrixXd combineMatrixRandom(MatrixXd &matrix1, MatrixXd &matrix2){
     int length = matrix1.rows(), height = matrix1.cols();
     MatrixXd output = MatrixXd::Zero(length,height);
     for(int r = 0; r < length; r++){
-        for(int c = 0; c < length; c++){
+        for(int c = 0; c < height; c++){
             double ranNum = unif(re);
             if(ranNum <= .5){
                 output(r,c) = matrix1(r,c);
@@ -20,12 +20,12 @@ MatrixXd combineMatrixRandom(MatrixXd &matrix1, MatrixXd &matrix2){
             }
         }
     }
-    output = output + 0.5 * MatrixXd::Random(length,height);
+    output = output + 0.25 * MatrixXd::Random(length,height);
     return output;
 }
 
-int compareFunction(Agent &a1, Agent &a2){
-    return a1.reward >= a2.reward;
+bool compareFunction(Agent *a1, Agent *a2){
+    return a1->reward >= a2->reward;
 }
 
 //take the top quarter of agents and repopulate from there
@@ -34,14 +34,30 @@ void crossover(Agent** agents,int length){
     std::uniform_int_distribution<int> iUnif(0,toKeep-1);
     for(int a = 0; a < length-toKeep; a++){
         //determine twoParents TODO: check to make sure parent1 != parent2
-        Agent* parent1 = agents[iUnif(re)], *parent2 = agents[iUnif(re)];
+        Agent* parent1 = agents[0], *parent2 = agents[iUnif(re)];
         Network* network = (agents[a+toKeep]->network);
-        for(int i = 0; i < network->length-1; i++){
+        for(int i = 0; i < (network->length)-1; i++){
+            //std::cout << network->weights[i] <<std::endl;
             network->weights[i] = combineMatrixRandom(parent1->network->weights[i],parent2->network->weights[i]);
+//std::cout << network->weights[i] << std::endl;
             network->bias[i] = combineMatrixRandom(parent1->network->bias[i],parent2->network->bias[i]);
         }
         network->bias[network->length-1] = combineMatrixRandom(parent1->network->bias[network->length-1],parent2->network->bias[network->length-1]);
         agents[a+toKeep]->network = network;
+    }
+}
+
+void sortAgents(Agent** agents, int length, bool (*compare)(Agent *, Agent *)){
+    for(int n = 0; n < length; n++){
+        int best = n;
+        for(int i = n + 1; i < length; i++){
+            if(compare(agents[i],agents[best])){
+                best = i;
+            }
+        }
+        Agent* toSwap = agents[best];
+        agents[best] = agents[n];
+        agents[n] = toSwap;
     }
 }
 
@@ -61,18 +77,20 @@ Agent* learn(EvoController *controller, int populationSize, int generations ){
     //main loop,
     for(int g = 1; g <= generations; g++){
         //loop through each agent
-        for(int i = 0; i < populationSize - 1; i++){
+        for(int i = 0; i < populationSize; i++){
             do{
                 //evaluate the agent's network on the current state
-                double* output;
+                double* output = new double[controller->outputSpaceLength];
                 controller->agents[i]->network->calc(controller->genInputSpace(i),controller->inputSpaceLength,output, controller->outputSpaceLength);
+
                 int reward = controller->state(output,i);
                 //process reward here
                 controller->agents[i]->reward += reward;
             }while(controller->agents[i]->endState());
         }
         //determine top performers
-        std::sort((controller->agents[0]), ((controller->agents[populationSize-1])), compareFunction);
+        sortAgents(controller->agents,populationSize,compareFunction);
+        //std::sort((controller->agents[0]), ((controller->agents[populationSize-1])), compareFunction);
         //mutation happens here
         //compute stats about generation
         int bestScore = controller->agents[0]->reward;
@@ -84,7 +102,7 @@ Agent* learn(EvoController *controller, int populationSize, int generations ){
         std::cout << "The best during generation " << g << " score was " << bestScore << " and the average score was " << averageScore << std::endl;
         crossover(controller->agents,populationSize);
         for(int a = 0; a < populationSize; a++){
-            controller->agents[a]->reward = 0;
+            controller->reset(a);
         }
     }
     return controller->agents[0];

@@ -63,8 +63,7 @@ Maze *MazeController::makeMaze() {
 }
 
 int MazeAgent::calcReward(int *move) {
-    static int steps = 0;
-    steps++;
+    this->moves++;
     int result = this->maze->move(move);
     int reward;
     if(result == -1){
@@ -73,7 +72,7 @@ int MazeAgent::calcReward(int *move) {
     }else if(result == 0){
         reward+=6;
     }else{
-        reward += 1000-steps;
+        reward += 1000-this->moves;
     }
     //check if agent is just walking in same pattern over and over;
     int *coords = this->maze->getCurrent();
@@ -83,12 +82,26 @@ int MazeAgent::calcReward(int *move) {
 }
 
 bool MazeAgent::endState() {
-    static int moves = 0;
-    moves++;
+    //this->moves++;
     int *pos = maze->getCurrent();
     int posA[2];
     posA[0] = pos[0];
     posA[1] = pos[1];
-    return !(maze->getTile(posA) == 2 || moves >= 100);
+    return !(maze->getTile(posA) == 2 || this->moves >= 100);
     //return Agent::endState();
+}
+
+void MazeController::reset(int agentNum) {
+    MazeAgent* agent = static_cast<MazeAgent *>(this->agents[agentNum]);
+    delete agent->maze;
+    agent->reward = 0;
+    agent->moves = 0;
+    agent->maze = this->makeMaze();
+    int length = agent->maze->getDimensions()[0];
+    for(int i = 0; i < agent->maze->getDimensions()[1]; i++){
+        agent->heatMap[i] = new int[length];
+        for(int j = 0; j < length; j++){
+            agent->heatMap[i][j] = 0;
+        }
+    }
 }
