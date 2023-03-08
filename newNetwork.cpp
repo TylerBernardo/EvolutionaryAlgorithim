@@ -32,19 +32,18 @@ Network::Network(int length, int *height){
         srand (static_cast <unsigned> (time(0)));
         this->length = length;
         this->height = height;
-        this->weights = new MatrixXd[length - 1];
-        this->bias = new MatrixXd[length];
-        this->inputs = new VectorXd[length];
-        //inputs[0] = VectorXd::Zero(4);
+        weights = new MatrixXd[length - 1];
+        bias = new MatrixXd[length];
+        inputs = new VectorXd[length];
         for(int i = 0; i < length; i++){
             if(i > 0){
                 MatrixXd wToAdd = MatrixXd::Random(height[i], height[i-1]) * 5;
-                this->weights[i- 1] = wToAdd;
+                weights[i- 1] = wToAdd;
                 MatrixXd bToAdd = MatrixXd::Random(height[i],1) * 5;
-                this->bias[i-1] = bToAdd;
+                bias[i-1] = bToAdd;
             }
             VectorXd iToAdd = VectorXd::Constant(height[i],0);
-            this->inputs[i] = iToAdd;
+            inputs[i] = iToAdd;
         }
     };
 
@@ -70,8 +69,7 @@ void Network::print(){
     };
 
 void Network::calc(VectorXd &input, MatrixXd &output){
-    //try to fix segfault when running "this->inputs[0] = input" Segfault occurs whenever writing to this->inputs[0]
-    this->inputs[0] = input;
+    inputs[0] = input;
     for(int i = 0; i < length-1; i++){
         MatrixXd result = weights[i] * inputs[i];
         result = result + bias[i];
