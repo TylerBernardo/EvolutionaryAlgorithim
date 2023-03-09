@@ -11,6 +11,7 @@
 #include <iostream>
 #include <string>
 #include <random>
+#include <thread>
 #include "newNetwork.h"
 using namespace Eigen;
 
@@ -57,6 +58,6 @@ class EvoController{
 
 
 
-Agent* learn(EvoController *controller, int populationSize, int generations );
+Agent* learn(EvoController *controller, int populationSize, int generations, int threads );
 
 #endif //EVOLUTIONARYALGORITHIM_EVO_H

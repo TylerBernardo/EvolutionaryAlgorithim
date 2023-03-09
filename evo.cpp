@@ -61,8 +61,21 @@ void sortAgents(Agent** agents, int length, bool (*compare)(Agent *, Agent *)){
     }
 }
 
+void calcGroup(EvoController *controller, int size, int start){
+    for(int i = 0; i < size; i++) {
+        do {
+            //evaluate the agent's network on the current state
+            double *output = new double[controller->outputSpaceLength];
+            controller->agents[start + i]->network->calc(controller->genInputSpace(start + i),controller->inputSpaceLength, output,controller->outputSpaceLength);
+            int reward = controller->state(output, start + i);
+            //process reward here
+            controller->agents[start + i]->reward += reward;
+        } while (controller->agents[start + i]->endState());
+    }
+}
+
 //takes in the length of the input space, a function to generate the input space, the length of the output space, and a function to map net outputs to the gamespace, which then returns reward info.
-Agent* learn(EvoController *controller, int populationSize, int generations ){
+Agent* learn(EvoController *controller, int populationSize, int generations, int threads){
     /*
      * Might be unneeded
     int networkLength = 2 + controller->hiddenLayerCount;
@@ -75,19 +88,26 @@ Agent* learn(EvoController *controller, int populationSize, int generations ){
      */
 
     //main loop,
+    int threadSize = std::ceil(populationSize/(1.0 * threads));
+    std::thread **threadList = new std::thread*[threads];
     for(int g = 1; g <= generations; g++){
-        //loop through each agent
-        for(int i = 0; i < populationSize; i++){
-            do{
-                //evaluate the agent's network on the current state
-                double* output = new double[controller->outputSpaceLength];
-                controller->agents[i]->network->calc(controller->genInputSpace(i),controller->inputSpaceLength,output, controller->outputSpaceLength);
+        //loop through each agent TODO: Use multithreading to process this faster
+        for(int i = 0; i < threads; i++){
+            if(i == threads - 1){
+                threadList[i] = new std::thread(calcGroup, controller, i * threadSize, populationSize - 1 - (i * threadSize));
+                //handle threadsize reaching outside of array
+            }else{
+                threadList[i] = new std::thread(calcGroup, controller, i * threadSize, threadSize);
 
-                int reward = controller->state(output,i);
-                //process reward here
-                controller->agents[i]->reward += reward;
-            }while(controller->agents[i]->endState());
+            }
         }
+        for(int t = 0; t < threads; t++){
+            threadList[t]->join();
+        }
+        for(int t = 0; t < threads; t++){
+            delete threadList[t];
+        }
+        delete[] threadList;
         //determine top performers
         sortAgents(controller->agents,populationSize,compareFunction);
         //std::sort((controller->agents[0]), ((controller->agents[populationSize-1])), compareFunction);
@@ -101,6 +121,7 @@ Agent* learn(EvoController *controller, int populationSize, int generations ){
         averageScore = averageScore/populationSize;
         std::cout << "The best during generation " << g << " score was " << bestScore << " and the average score was " << averageScore << std::endl;
         crossover(controller->agents,populationSize);
+        //possibly multithreading this as well. Maybe rewrite reset to automatically reset all agents, so that multithreading can be implemented on a case to case basis
         for(int a = 0; a < populationSize; a++){
             controller->reset(a);
         }

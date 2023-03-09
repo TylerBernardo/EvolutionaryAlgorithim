@@ -7,9 +7,10 @@
 
 using namespace Eigen;
 //https://www.jetbrains.com/help/clion/apply-changes-from-one-branch-to-another.html#merge
+//719 total lines
 int main() {
     int length = 5;
-    int *height = new int[length]{10,6,6,6,10};
+    int *height = new int[length]{10,12,14,12,10};
     //Network myNetwork = {length,height};
     //myNetwork.calc(input,output);
     //myNetwork.clearMemory();
@@ -23,7 +24,7 @@ int main() {
     int generations = 10000;
     MazeController mazeC = {3,height,populationSize,dimensionsTemp,start,stop,mazeTemp};
     //myMaze.print();
-    MazeAgent* best = dynamic_cast<MazeAgent *>(learn(&mazeC, populationSize, generations));
+    MazeAgent* best = dynamic_cast<MazeAgent *>(learn(&mazeC, populationSize, generations,2));
     mazeC.reset(0);
     do{
         //evaluate the agent's network on the current state

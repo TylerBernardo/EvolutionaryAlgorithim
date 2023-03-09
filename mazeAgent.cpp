@@ -53,6 +53,9 @@ int MazeController::state(double *output, int agentNumber) {
             move[1] = 0;
             break;
     };
+    if(agentNumber == 50){
+        std::cout << "Pausing here" << std::endl;
+    }
     MazeAgent* currentAgent = dynamic_cast<MazeAgent *>(this->agents[agentNumber]);
     return currentAgent->calcReward(move);
 }
