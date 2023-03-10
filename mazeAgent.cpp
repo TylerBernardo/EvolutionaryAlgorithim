@@ -17,12 +17,24 @@ MazeAgent *MazeController::createAgent() {
     return toReturn;
 }
 
+//also get the tile at the end of each ray
 double* MazeController::genInputSpace(int agentNumber) {
     MazeAgent* currentAgent = dynamic_cast<MazeAgent *>(this->agents[agentNumber]);
     Maze* currentMaze = currentAgent->maze;
-    int mazeSight[4];
+    int mazeSight[8];
     currentMaze->getDistance(mazeSight);
-    double *inputs = new double[6]{static_cast<double>(currentMaze->getCurrent()[0]),static_cast<double>(currentMaze->getCurrent()[1]),static_cast<double>(mazeSight[0]),static_cast<double>(mazeSight[1]),static_cast<double>(mazeSight[2]),static_cast<double>(mazeSight[3])};
+    //static_cast<double>(mazeSight[0]),static_cast<double>(mazeSight[1]),static_cast<double>(mazeSight[2]),static_cast<double>(mazeSight[3])
+    double *inputs = new double[10 + this->dim[0] * this->dim[1]]{static_cast<double>(currentMaze->getCurrent()[0]),static_cast<double>(currentMaze->getCurrent()[1])};
+    for(int k = 0; k < 8; k++){
+        inputs[2+k] = static_cast<double>(mazeSight[k]);
+    }
+    int length = currentMaze->getDimensions()[0], height = currentMaze->getDimensions()[1];
+    int **heatMap = currentAgent->heatMap;
+    for(int i = 0; i < height; i++){
+        for(int j = 0; j < length; j++){
+            inputs[6 + i * height + j] = heatMap[i][j];
+        }
+    }
     return inputs;
 }
 
@@ -58,7 +70,7 @@ int MazeController::state(double *output, int agentNumber) {
 }
 
 Maze *MazeController::makeMaze() {
-    return new Maze(this->dim,this->cur,this->end,this->mazeData);
+    return new Maze(this->dim,this->cur,this->currentMaze);
     //return nullptr;
 }
 //print heatmap to console
@@ -104,17 +116,24 @@ bool MazeAgent::endState() {
     //return Agent::endState();
 }
 
-void MazeController::reset(int agentNum) {
-    MazeAgent* agent = static_cast<MazeAgent *>(this->agents[agentNum]);
-    delete agent->maze;
-    agent->reward = 0;
-    agent->moves = 0;
-    agent->maze = this->makeMaze();
-    int length = agent->maze->getDimensions()[0];
-    for(int i = 0; i < agent->maze->getDimensions()[1]; i++){
-        agent->heatMap[i] = new int[length];
-        for(int j = 0; j < length; j++){
-            agent->heatMap[i][j] = 0;
+void MazeController::reset() {
+    static std::uniform_int_distribution<int> unif(0,this->mazes - 1);
+    static std::default_random_engine re;
+    int randomNum = unif(re);
+    //std::cout << randomNum << std::endl;
+    this->currentMaze = this->mazeData[randomNum];
+    for(int agentNum = 0; agentNum < this->agentCount; agentNum++){
+        MazeAgent* agent = static_cast<MazeAgent *>(this->agents[agentNum]);
+        delete agent->maze;
+        agent->reward = 0;
+        agent->moves = 0;
+        agent->maze = this->makeMaze();
+        int length = agent->maze->getDimensions()[0];
+        for(int i = 0; i < agent->maze->getDimensions()[1]; i++){
+            agent->heatMap[i] = new int[length];
+            for(int j = 0; j < length; j++){
+                agent->heatMap[i][j] = 0;
+            }
         }
     }
 }

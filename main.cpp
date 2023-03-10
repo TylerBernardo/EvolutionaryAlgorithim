@@ -9,23 +9,26 @@ using namespace Eigen;
 //https://www.jetbrains.com/help/clion/apply-changes-from-one-branch-to-another.html#merge
 //719 total lines
 int main() {
-    int length = 5;
-    int *height = new int[length]{10,12,14,12,10};
+    int length = 6;
+    int *height = new int[length]{30,20,15,15,15,20};
     //Network myNetwork = {length,height};
     //myNetwork.calc(input,output);
     //myNetwork.clearMemory();
     //void (*genInputSpace)(int *);
     int mazeTemp[25] = {0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 2, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 1};
+    int mazeTwo[25] = {0,0,0,0,0,0,1,0,1,0,0,1,0,1,0,0,1,0,1,0,0,1,0,1,2};
+    int mazeThree[25] = {0,1,0,0,2,1,1,0,1,0,0,0,0,0,0,0,1,0,1,1,0,0,0,1,0};
+    int mazeCount = 3;
+    int **mazes = new int*[mazeCount]{mazeTemp,mazeTwo,mazeThree};
     int dimensionsTemp[2] = {5,5};
     int start[2] = {2,2};
-    int stop[2] = {0,2};
-    Maze myMaze = {dimensionsTemp, start, stop,mazeTemp};
-    int populationSize = 100;
+    Maze myMaze = {dimensionsTemp, start,mazeTemp};
+    int populationSize = 200;
     int generations = 10000;
-    MazeController mazeC = {3,height,populationSize,dimensionsTemp,start,stop,mazeTemp};
+    MazeController mazeC = {5,height,populationSize,dimensionsTemp,start,mazes,mazeCount};
     //myMaze.print();
     MazeAgent* best = dynamic_cast<MazeAgent *>(learn(&mazeC, populationSize, generations,24));
-    mazeC.reset(0);
+    mazeC.reset();
     do{
         //evaluate the agent's network on the current state
         double* output = new double[mazeC.outputSpaceLength];

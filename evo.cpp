@@ -99,7 +99,6 @@ Agent* learn(EvoController *controller, int populationSize, int generations, int
     std::thread **threadList = new std::thread*[threads];
     for(int g = 1; g <= generations; g++){
         //loop through each agent TODO: Use multithreading to process this faster
-        std::cout << "Starting threads" << std::endl;
         /*
         for(int i = 0; i < threads ; i++){
             if(i == threads - 1){
@@ -112,6 +111,7 @@ Agent* learn(EvoController *controller, int populationSize, int generations, int
 
         }
          */
+        auto start = std::chrono::high_resolution_clock::now();
         for(int i = 0; i < threads ; i++){
             if(i == threads - 1){
                 threadList[i] = new std::thread(calcGroup, controller,  (i * threadSize), populationSize - 1);
@@ -127,17 +127,11 @@ Agent* learn(EvoController *controller, int populationSize, int generations, int
         }
 
         for(int t = 0; t < threads; t++){
-            try{
-                //threadList[t]->detach();
-                delete threadList[t];
-            }catch(int eCode){
-                std::cout << "Error with code " << eCode << " occurred at t = " << t << std::endl;
-            }
+            delete threadList[t];
         }
 
         //determine top performers
         sortAgents(controller->agents,populationSize,compareFunction);
-        //std::sort((controller->agents[0]), ((controller->agents[populationSize-1])), compareFunction);
         //mutation happens here
         //compute stats about generation
         int bestScore = controller->agents[0]->reward;
@@ -145,13 +139,18 @@ Agent* learn(EvoController *controller, int populationSize, int generations, int
         for(int k = 1; k < populationSize; k++){
             averageScore += controller->agents[k]->reward;
         }
+        auto stop = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds >(stop - start);
         averageScore = averageScore/populationSize;
-        std::cout << "The best during generation " << g << " score was " << bestScore << " and the average score was " << averageScore << std::endl;
+        std::cout << "The best during generation " << g << " score was " << bestScore << " and the average score was " << averageScore << " in " << duration.count() << " milliseconds" << std::endl;
         crossover(controller->agents,populationSize);
         //possibly multithreading this as well. Maybe rewrite reset to automatically reset all agents, so that multithreading can be implemented on a case to case basis
+        /*
         for(int a = 0; a < populationSize; a++){
             controller->reset(a);
         }
+         */
+        controller->reset();
     }
     delete[] threadList;
     return controller->agents[0];

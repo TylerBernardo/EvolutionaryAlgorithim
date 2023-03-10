@@ -50,24 +50,25 @@ class MazeAgent : public Agent{
 class MazeController : public EvoController{
     int dim[2];
     int cur[2];
-    int end[2];
-    int *mazeData;
+    int **mazeData;
+    int* currentMaze;
+    int mazes;
     public:
         //MazeAgent **agents;
-        MazeController(int _hiddenLayerCount, int* _hiddenLayers, int _agentCount,int (&_dim)[2], int (&_cur)[2], int (&_end)[2], int *_mazeData){
+        MazeController(int _hiddenLayerCount, int* _hiddenLayers, int _agentCount,int (&_dim)[2], int (&_cur)[2], int **_mazeData, int _mazes){
             this->dim[0] = _dim[0];
             this->dim[1] = _dim[1];
             this->cur[0] = _cur[0];
             this->cur[1] = _cur[1];
-            this->end[0] = _end[0];
-            this->end[1] = _end[1];
             this->mazeData = _mazeData;
-            this->inputSpaceLength = 6;
+            this->inputSpaceLength = 10 + _dim[0] * _dim[1];
             this->outputSpaceLength = 4;
             this->hiddenLayerCount = _hiddenLayerCount;
             this->hiddenLayers = _hiddenLayers;
             this->agentCount = _agentCount;
             this-> agents = new Agent *[this->agentCount];
+            this -> currentMaze = mazeData[0];
+            this-> mazes = _mazes;
             for(int i = 0; i < agentCount; i++){
                 agents[i] = this->createAgent();
             }
@@ -79,7 +80,7 @@ class MazeController : public EvoController{
         //creates an agent
         MazeAgent* createAgent() override;
 
-        void reset(int agentNumber) override;
+        void reset() override;
 
         Maze* makeMaze();
 

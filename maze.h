@@ -9,12 +9,11 @@ class Maze {
     //xy
     int dimensions[2];
     int current[2] = {0, 0};
-    int end[2];
     int **maze;
 
 public:
-    Maze(int (&dim)[2], int (&cur)[2], int (&end)[2], int *maze);
-    void getDistance(int (&distance)[4]);
+    Maze(int (&dim)[2], int (&cur)[2], int *maze);
+    void getDistance(int (&distance)[8]);
 
     int getTile(int (&move)[2]);
 

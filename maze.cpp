@@ -9,11 +9,9 @@ int* Maze::getCurrent() {
     return this->current;
 }
 
-Maze::Maze(int (&dim)[2],int (&cur)[2],int (&end)[2], int * maze){
+Maze::Maze(int (&dim)[2],int (&cur)[2], int * maze){
         dimensions[0] = dim[0];
         dimensions[1] = dim[1];
-        this->end[0] = end[0];
-        this->end[1] = end[1];
         current[0] = cur[0];
         current[1] = cur[1];
         //std::cout << current[0] << " " << current[1] << std::endl;
@@ -28,7 +26,7 @@ Maze::Maze(int (&dim)[2],int (&cur)[2],int (&end)[2], int * maze){
 
 //casts rays in 8 directions, starting at (0,-1) and moving clockwise
 //[UP, RIGHT, DOWN, LEFT]
-void Maze::getDistance(int (&distance)[4]){
+void Maze::getDistance(int (&distance)[8]){
         int directions [4][2] = {{0,-1},{1,0},{0,1},{-1,0}};
         for(int i = 0; i < 4; i++){
             bool done = false;
@@ -36,9 +34,10 @@ void Maze::getDistance(int (&distance)[4]){
             do{
                 int newMove[2] = {current[0] + directions[i][0] * k,current[1] + directions[i][1] * k};
                 int result = getTile(newMove);
-                if(result == -1 || result == 1){
+                if(result == -1 || result == 1 || result == 2){
                     done = true;
                     distance[i] = k-1;
+                    distance[i + 4] = std::abs(result);
                 }else{
                     k++;
                 }

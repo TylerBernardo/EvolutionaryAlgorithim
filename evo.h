@@ -12,6 +12,7 @@
 #include <string>
 #include <random>
 #include <thread>
+#include <chrono>
 #include "newNetwork.h"
 using namespace Eigen;
 
@@ -53,8 +54,7 @@ class EvoController{
         //creates an agent
         virtual Agent* createAgent(){return nullptr;};
         //reset agent at agents[agentNum]
-        virtual void reset(int agentNum){};
-
+        virtual void reset(){};
 };
 
 
