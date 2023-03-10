@@ -25,6 +25,7 @@ class Agent{
         //should the simulation end? Returns true when it should
         virtual bool endState(){return false;};
 
+        virtual void printHeatMap(){};
         ~Agent(){
             //delete network;
         }

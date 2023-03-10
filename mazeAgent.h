@@ -33,7 +33,7 @@ class MazeAgent : public Agent{
 
         bool endState() override;
 
-
+        void printHeatMap() override;
 
         int calcReward(int move[2]);
 

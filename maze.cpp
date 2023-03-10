@@ -61,7 +61,6 @@ void Maze::print(){
                 }else{
                     std::cout << maze[r][c] << " ";
                 }
-
             }
             std::cout << std::endl;
         }

@@ -24,7 +24,7 @@ int main() {
     int generations = 10000;
     MazeController mazeC = {3,height,populationSize,dimensionsTemp,start,stop,mazeTemp};
     //myMaze.print();
-    MazeAgent* best = dynamic_cast<MazeAgent *>(learn(&mazeC, populationSize, generations,2));
+    MazeAgent* best = dynamic_cast<MazeAgent *>(learn(&mazeC, populationSize, generations,24));
     mazeC.reset(0);
     do{
         //evaluate the agent's network on the current state
@@ -36,6 +36,7 @@ int main() {
         //process reward here
         best->reward += reward;
     }while(best->endState());
+    best->printHeatMap();
     /*
     std::cout << std::endl;
     myMaze.print();

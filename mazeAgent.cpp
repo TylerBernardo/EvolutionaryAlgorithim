@@ -53,9 +53,6 @@ int MazeController::state(double *output, int agentNumber) {
             move[1] = 0;
             break;
     };
-    if(agentNumber == 50){
-        std::cout << "Pausing here" << std::endl;
-    }
     MazeAgent* currentAgent = dynamic_cast<MazeAgent *>(this->agents[agentNumber]);
     return currentAgent->calcReward(move);
 }
@@ -64,11 +61,21 @@ Maze *MazeController::makeMaze() {
     return new Maze(this->dim,this->cur,this->end,this->mazeData);
     //return nullptr;
 }
+//print heatmap to console
+void MazeAgent::printHeatMap(){
+    int length = maze->getDimensions()[0];
+    for(int i = 0; i < maze->getDimensions()[1]; i++){
+        for(int j = 0; j < length; j++){
+           std::cout << heatMap[i][j] << " ";
+        }
+        std::cout << std::endl;
+    }
+}
 
 int MazeAgent::calcReward(int *move) {
     this->moves++;
     int result = this->maze->move(move);
-    int reward;
+    int reward = 0;
     if(result == -1){
         reward = -500;
         //this->reward = reward;
@@ -79,7 +86,10 @@ int MazeAgent::calcReward(int *move) {
     }
     //check if agent is just walking in same pattern over and over;
     int *coords = this->maze->getCurrent();
-    reward -= heatMap[coords[1]][coords[0]]++;
+    if(this->reward >= 0){
+        //std::cout << "possible problem" << std::endl;
+    }
+    reward -= ((heatMap[coords[1]][coords[0]])++);
     //this->reward = reward;
     return reward;
 }

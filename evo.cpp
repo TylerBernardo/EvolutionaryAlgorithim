@@ -61,17 +61,24 @@ void sortAgents(Agent** agents, int length, bool (*compare)(Agent *, Agent *)){
     }
 }
 
-void calcGroup(EvoController *controller, int size, int start){
-    for(int i = 0; i < size; i++) {
-        do {
-            //evaluate the agent's network on the current state
-            double *output = new double[controller->outputSpaceLength];
-            controller->agents[start + i]->network->calc(controller->genInputSpace(start + i),controller->inputSpaceLength, output,controller->outputSpaceLength);
-            int reward = controller->state(output, start + i);
-            //process reward here
-            controller->agents[start + i]->reward += reward;
-        } while (controller->agents[start + i]->endState());
+void calcGroup(EvoController *controller, int start, int end){
+    //std::cout << "Calculating the agents from " + std::to_string(start) + " to " + std::to_string(end) << std::endl;
+    try{
+        for(int i = start; i <= end; i++) {
+            do {
+                //evaluate the agent's network on the current state
+                double *output = new double[controller->outputSpaceLength];
+                controller->agents[i]->network->calc(controller->genInputSpace(i),controller->inputSpaceLength, output,controller->outputSpaceLength);
+                int reward = controller->state(output, i);
+                //process reward here
+                controller->agents[i]->reward += reward;
+            } while (controller->agents[i]->endState());
+        }
+    }catch(int eCode){
+        std::cout << "There was an error with error code " << eCode << " when processing the batch starting at " << start << std::endl;
+        throw(eCode);
     }
+
 }
 
 //takes in the length of the input space, a function to generate the input space, the length of the output space, and a function to map net outputs to the gamespace, which then returns reward info.
@@ -88,26 +95,46 @@ Agent* learn(EvoController *controller, int populationSize, int generations, int
      */
 
     //main loop,
-    int threadSize = std::ceil(populationSize/(1.0 * threads));
+    int threadSize = std::floor(populationSize/(1.0 * threads));
     std::thread **threadList = new std::thread*[threads];
     for(int g = 1; g <= generations; g++){
         //loop through each agent TODO: Use multithreading to process this faster
-        for(int i = 0; i < threads; i++){
+        std::cout << "Starting threads" << std::endl;
+        /*
+        for(int i = 0; i < threads ; i++){
             if(i == threads - 1){
-                threadList[i] = new std::thread(calcGroup, controller, i * threadSize, populationSize - 1 - (i * threadSize));
+                std::cout << "Will make a thread from " << i * threadSize << " to " << populationSize - 1 << std::endl;
                 //handle threadsize reaching outside of array
             }else{
-                threadList[i] = new std::thread(calcGroup, controller, i * threadSize, threadSize);
+                std::cout << "Will make a thread from " << i * threadSize << " to " << (i+1) * threadSize - 1 << std::endl;
+
+            }
+
+        }
+         */
+        for(int i = 0; i < threads ; i++){
+            if(i == threads - 1){
+                threadList[i] = new std::thread(calcGroup, controller,  (i * threadSize), populationSize - 1);
+                //handle threadsize reaching outside of array
+            }else{
+                threadList[i] = new std::thread(calcGroup, controller,  i*threadSize, (i+1) * threadSize - 1);
 
             }
         }
         for(int t = 0; t < threads; t++){
             threadList[t]->join();
+            //std::cout << "Thread " << t << " has finished" << std::endl;
         }
+
         for(int t = 0; t < threads; t++){
-            delete threadList[t];
+            try{
+                //threadList[t]->detach();
+                delete threadList[t];
+            }catch(int eCode){
+                std::cout << "Error with code " << eCode << " occurred at t = " << t << std::endl;
+            }
         }
-        delete[] threadList;
+
         //determine top performers
         sortAgents(controller->agents,populationSize,compareFunction);
         //std::sort((controller->agents[0]), ((controller->agents[populationSize-1])), compareFunction);
@@ -126,5 +153,6 @@ Agent* learn(EvoController *controller, int populationSize, int generations, int
             controller->reset(a);
         }
     }
+    delete[] threadList;
     return controller->agents[0];
 }
