@@ -9,8 +9,8 @@ using namespace Eigen;
 //https://www.jetbrains.com/help/clion/apply-changes-from-one-branch-to-another.html#merge
 //719 total lines
 int main() {
-    int length = 6;
-    int *height = new int[length]{30,20,15,15,15,20};
+    int length = 7;
+    int *height = new int[length]{30,30,20,15,15,20,30};
     //Network myNetwork = {length,height};
     //myNetwork.calc(input,output);
     //myNetwork.clearMemory();

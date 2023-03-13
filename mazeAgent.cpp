@@ -13,6 +13,7 @@ MazeAgent *MazeController::createAgent() {
    for(int i = 1; i < hiddenLayerCount + 1; i++){
        networkHeights[i] = hiddenLayers[i-1];
    }
+    delete toReturn->network;
     toReturn->network = new Network((this->hiddenLayerCount)+2,networkHeights);
     return toReturn;
 }
@@ -130,6 +131,7 @@ void MazeController::reset() {
         agent->maze = this->makeMaze();
         int length = agent->maze->getDimensions()[0];
         for(int i = 0; i < agent->maze->getDimensions()[1]; i++){
+            delete[] agent->heatMap[i];
             agent->heatMap[i] = new int[length];
             for(int j = 0; j < length; j++){
                 agent->heatMap[i][j] = 0;

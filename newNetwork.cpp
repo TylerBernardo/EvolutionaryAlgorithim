@@ -51,6 +51,7 @@ Network::~Network(){
     delete[] weights;
     delete[] bias;
     delete[] inputs;
+    delete[] dna;
 }
 
 void Network::clearMemory(){
@@ -98,6 +99,7 @@ void Network::generateDNA() {
         size += weights[i].rows() * weights[i].cols();
         size += bias[i].rows() * bias[i].cols();
     }
+    delete[] dna;
     dna = new double[size];
     //add weights
     int current = 0;

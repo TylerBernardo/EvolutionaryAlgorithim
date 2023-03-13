@@ -68,10 +68,13 @@ void calcGroup(EvoController *controller, int start, int end){
             do {
                 //evaluate the agent's network on the current state
                 double *output = new double[controller->outputSpaceLength];
-                controller->agents[i]->network->calc(controller->genInputSpace(i),controller->inputSpaceLength, output,controller->outputSpaceLength);
+                double *input = controller->genInputSpace(i);
+                controller->agents[i]->network->calc(input,controller->inputSpaceLength, output,controller->outputSpaceLength);
                 int reward = controller->state(output, i);
                 //process reward here
                 controller->agents[i]->reward += reward;
+                delete[] output;
+                delete[] input;
             } while (controller->agents[i]->endState());
         }
     }catch(int eCode){

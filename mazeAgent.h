@@ -43,7 +43,7 @@ class MazeAgent : public Agent{
             }
             delete[] heatMap;
             delete[] maze;
-            delete[] &network;
+            delete network;
         }
 };
 

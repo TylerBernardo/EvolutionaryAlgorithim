@@ -13,6 +13,12 @@ class Maze {
 
 public:
     Maze(int (&dim)[2], int (&cur)[2], int *maze);
+    ~Maze(){
+        for(int i = 0; i < this->dimensions[1]; i++){
+            delete[] this->maze[i];
+        }
+        delete[] this->maze;
+    }
     void getDistance(int (&distance)[8]);
 
     int getTile(int (&move)[2]);
