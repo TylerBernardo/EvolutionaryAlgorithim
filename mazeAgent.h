@@ -33,7 +33,7 @@ class MazeAgent : public Agent{
 
         bool endState() override;
 
-        void printHeatMap() override;
+        void printHeatMap();
 
         int calcReward(int move[2]);
 
@@ -82,11 +82,13 @@ class MazeController : public EvoController{
 
         void reset() override;
 
+        //void save(std::string const &path) override;
+
         Maze* makeMaze();
 
         ~MazeController(){
             for(int i = 0; i < agentCount; i++){
-                delete &agents[i];
+                delete agents[i];
             }
             delete[] agents;
         }

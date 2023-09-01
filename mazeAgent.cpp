@@ -117,6 +117,7 @@ bool MazeAgent::endState() {
     //return Agent::endState();
 }
 
+//TODO: Investigate ways to speed this function up
 void MazeController::reset() {
     static std::uniform_int_distribution<int> unif(0,this->mazes - 1);
     static std::default_random_engine re;
@@ -139,3 +140,4 @@ void MazeController::reset() {
         }
     }
 }
+
