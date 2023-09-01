@@ -21,24 +21,23 @@ class Network {
     //contains the weights and biases for each. Value encoding acording to this link : https://www.obitko.com/tutorials/genetic-algorithms/encoding.php
     //mutation can take random parts of each parent and make a new one.
     //matrix is fixed shape
-    public:
-        MatrixXd* weights;
-        MatrixXd* bias;
-        VectorXd* inputs;
-        int *height;
-        int length;
-        int size = 0;
-        double* dna;
-        Network();
-        Network(int length, int *height);
-        ~Network();
-        void print();
-        void calc(VectorXd &input, MatrixXd &output);
-        void calc(double *input, int inputLength, double *output, int outputLength);
-        void clearMemory();
-        void generateDNA();
-        void convert(std::string& output);
-        void convert(std::string* input,double* output);
+public:
+    MatrixXd* weights;
+    MatrixXd* bias;
+    VectorXd* inputs;
+    int *height;
+    int length;
+    int size = 0;
+    Network();
+    Network(int length, int *height);
+    Network(std::string *data);
+    ~Network();
+    void print();
+    void calc(VectorXd &input, MatrixXd &output);
+    void calc(double *input, int inputLength, double *output, int outputLength);
+    void clearMemory();
+    std::string* networkToString();
+
 };
 
 #endif //EVOLUTIONARYALGORITHIM_NEWNETWORK_H

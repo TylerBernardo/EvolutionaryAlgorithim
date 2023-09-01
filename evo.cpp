@@ -64,10 +64,11 @@ void sortAgents(Agent** agents, int length, bool (*compare)(Agent *, Agent *)){
 void calcGroup(EvoController *controller, int start, int end){
     //std::cout << "Calculating the agents from " + std::to_string(start) + " to " + std::to_string(end) << std::endl;
     try{
+        double *output = nullptr;
         for(int i = start; i <= end; i++) {
             do {
                 //evaluate the agent's network on the current state
-                double *output = new double[controller->outputSpaceLength];
+                output = new double[controller->outputSpaceLength];
                 double *input = controller->genInputSpace(i);
                 controller->agents[i]->network->calc(input,controller->inputSpaceLength, output,controller->outputSpaceLength);
                 int reward = controller->state(output, i);
@@ -142,10 +143,9 @@ Agent* learn(EvoController *controller, int populationSize, int generations, int
         for(int k = 1; k < populationSize; k++){
             averageScore += controller->agents[k]->reward;
         }
-        auto stop = std::chrono::high_resolution_clock::now();
-        auto duration = std::chrono::duration_cast<std::chrono::milliseconds >(stop - start);
+
         averageScore = averageScore/populationSize;
-        std::cout << "The best during generation " << g << " score was " << bestScore << " and the average score was " << averageScore << " in " << duration.count() << " milliseconds" << std::endl;
+        std::cout << "The best during generation " << g << " score was " << bestScore << " and the average score was " << averageScore << " in " ;
         crossover(controller->agents,populationSize);
         //possibly multithreading this as well. Maybe rewrite reset to automatically reset all agents, so that multithreading can be implemented on a case to case basis
         /*
@@ -153,7 +153,11 @@ Agent* learn(EvoController *controller, int populationSize, int generations, int
             controller->reset(a);
         }
          */
+        //TODO: Investigate performance of reset function. Over half of runtime per generation dedicated to it
         controller->reset();
+        auto stop = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds >(stop - start);
+        std::cout << duration.count() << " milliseconds" << std::endl;
     }
     delete[] threadList;
     return controller->agents[0];
